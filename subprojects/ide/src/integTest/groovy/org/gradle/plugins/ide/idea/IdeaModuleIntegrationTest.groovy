@@ -16,6 +16,7 @@
 
 package org.gradle.plugins.ide.idea
 
+import groovy.transform.NotYetImplemented
 import org.gradle.integtests.fixtures.TestResources
 import org.gradle.integtests.fixtures.executer.ExecutionResult
 import org.gradle.plugins.ide.AbstractIdeIntegrationTest
@@ -738,5 +739,57 @@ dependencies {
         assert dependencies.libraries.size() == 2
         dependencies.assertHasLibrary('TEST', 'bothCompileAndCompileOnly-1.0.jar')
         dependencies.assertHasLibrary('TEST', 'bothCompileAndCompileOnly-2.0.jar')
+    }
+
+    @Test
+    @NotYetImplemented
+    void "providedCompile dependencies are added to PROVIDED only"() {
+        // given
+        mavenRepo.module('org.gradle.test', 'foo', '1.0').publish()
+
+        // when
+        runIdeaTask """
+            apply plugin: 'war'
+            apply plugin: 'idea'
+
+            repositories {
+                maven { url "${mavenRepo.uri}" }
+            }
+
+            dependencies {
+                providedCompile 'org.gradle.test:foo:1.0'
+            }
+        """.stripIndent()
+
+        // then
+        def dependencies = parseIml("root.iml").dependencies
+        assert dependencies.libraries.size() == 1
+        dependencies.assertHasLibrary('PROVIDED', 'foo-1.0.jar')
+    }
+
+    @Test
+    @NotYetImplemented
+    void "providedRuntime dependencies are added to PROVIDED only"() {
+        // given
+        mavenRepo.module('org.gradle.test', 'foo', '1.0').publish()
+
+        // when
+        runIdeaTask """
+            apply plugin: 'war'
+            apply plugin: 'idea'
+
+            repositories {
+                maven { url "${mavenRepo.uri}" }
+            }
+
+            dependencies {
+                providedRuntime 'org.gradle.test:foo:1.0'
+            }
+        """.stripIndent()
+
+        // then
+        def dependencies = parseIml("root.iml").dependencies
+        assert dependencies.libraries.size() == 1
+        dependencies.assertHasLibrary('PROVIDED', 'foo-1.0.jar')
     }
 }
