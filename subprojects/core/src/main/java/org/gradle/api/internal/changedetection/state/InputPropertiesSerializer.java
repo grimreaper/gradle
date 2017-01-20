@@ -28,7 +28,7 @@ class InputPropertiesSerializer implements Serializer<Map<String, Object>> {
     private final MapSerializer<String, Object> serializer;
 
     InputPropertiesSerializer(ClassLoader classloader) {
-        this.serializer = new MapSerializer<String, Object>(BaseSerializerFactory.STRING_SERIALIZER, new DefaultSerializer<Object>(classloader));
+        this.serializer = new MapSerializer<String, Object>(BaseSerializerFactory.STRING_SERIALIZER, new WellKnownTypesSerializer<Object>(classloader));
     }
 
     public Map<String, Object> read(Decoder decoder) throws Exception {
